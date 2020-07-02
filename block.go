@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/gob"
+	"fmt"
+	"os"
 	"time"
 )
 
@@ -83,6 +86,48 @@ func (block *Block) SetHash() {
 
 	hash := sha256.Sum256(blockByteInfo)
 	block.Hash = hash[:]
+}
+
+func (block *Block) toByte() []byte {
+	//TODO
+	return []byte{}
+}
+
+func (block *Block) Serialize() []byte  {
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
+
+	err := encoder.Encode(&block)
+	if err != nil {
+		panic(err)
+	}
+
+	return buffer.Bytes()
+}
+
+// 反序列化:将接受到的字节流转换成目标结构。
+func Deserialize(data []byte) Block {
+	var block Block
+	var buffer bytes.Buffer
+
+	//将data写入buffer
+	_, err := buffer.Write(data)
+	if err != nil {
+		fmt.Println("buffer.Read failed!", err)
+		os.Exit(1)
+	}
+
+	//创建decoder
+	decoder := gob.NewDecoder(&buffer)
+
+	//将buffer数据转换成block
+	err = decoder.Decode(&block)
+	if err != nil {
+		fmt.Println("decode failed!", err)
+		os.Exit(1)
+	}
+
+	return block
 }
 
 func Uint64ToByte(num uint64) []byte {

@@ -26,6 +26,12 @@ func NewProofOfWork(block *Block) *ProofOfWork {
 	tmpInt.SetString(targetStr, 16)
 
 	pow.target = &tmpInt
+
+	//targetLocal := big.NewInt(1)
+	////targetLocal.Lsh(targetLocal, 256)
+	////targetLocal.Rsh(targetLocal, difficulty)
+	//targetLocal.Lsh(targetLocal, 256-difficulty)
+	//pow.target = targetLocal
 	return pow
 }
 
@@ -41,24 +47,11 @@ func (pow *ProofOfWork) Run() ([]byte, uint64) {
 	//b. 没找到，继续找，随机数加1
 
 	var nonce uint64
-	block := pow.block
 	var hash [32]byte
 
 	for {
 		//1. 拼装数据（区块的数据，还有不断变化的随机数）
-		tmp := [][]byte{
-			Uint64ToByte(block.Version),
-			block.PrevHash,
-			block.MerKleRoot,
-			Uint64ToByte(block.TimeStamp),
-			Uint64ToByte(block.Difficulty),
-			Uint64ToByte(nonce),
-			block.Data,
-		}
-
-		blockInfo := bytes.Join(tmp, []byte{})
-
-		hash = sha256.Sum256(blockInfo)
+		hash = sha256.Sum256(pow.prepareData(nonce))
 
 		tmpInt := big.Int{}
 		tmpInt.SetBytes(hash[:])
@@ -72,11 +65,37 @@ func (pow *ProofOfWork) Run() ([]byte, uint64) {
 	}
 }
 
+func (pow *ProofOfWork) prepareData(nonce uint64) []byte {
+	block := pow.block
+	tmp := [][]byte{
+		Uint64ToByte(block.Version),
+		block.PrevHash,
+		//block.Hash,
+		block.MerKleRoot,
+		Uint64ToByte(block.TimeStamp),
+		Uint64ToByte(block.Difficulty),
+		Uint64ToByte(nonce),
+		block.Data}
+
+	data := bytes.Join(tmp, []byte{})
+	return data
+}
 //
 //4. 提供一个校验函数
 //
 //- IsValid()
 
-func (pow *ProofOfWork) IsValid() {
+func (pow *ProofOfWork)IsValid()  bool{
+	hash := sha256.Sum256(pow.prepareData(pow.block.Nonce))
+	fmt.Printf("is valid hash : %x, %d\n", hash[:], pow.block.Nonce)
 
+	tTmp := big.Int{}
+	tTmp.SetBytes(hash[:])
+	if tTmp.Cmp(pow.target)  == -1 {
+		return true
+	}
+
+	return false
+
+	//return tTmp.Cmp(&pow.target)  == -1
 }
