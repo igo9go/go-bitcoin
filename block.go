@@ -32,11 +32,13 @@ type Block struct {
 	// 当前区块哈希
 	Hash []byte
 	// 数据
-	Data []byte
+	//Data []byte
+
+	Transactions []*Transaction
 }
 
 //2. 创建区块
-func NewBlock(data string, prevBlockHash []byte) *Block {
+func NewBlock(txs []*Transaction, prevBlockHash []byte) *Block {
 	block := Block{
 		Version:    00,
 		PrevHash:   prevBlockHash,
@@ -44,10 +46,12 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 		TimeStamp:  uint64(time.Now().Unix()),
 		Difficulty: 100,
 		Nonce:      100,
-		Data:       []byte(data),
+		//Data:       []byte(data),
+		Transactions: txs,
 		//Hash:    []byte{}, //先填为空，后面再进行计算
 	}
 
+	block.MerKleRoot = block.MakeMerkleRoot()
 	//block.SetHash()
 
 	//挖矿
@@ -75,7 +79,7 @@ func (block *Block) SetHash() {
 
 	tmp := [][]byte{
 		block.PrevHash,
-		block.Data,
+		//block.Data,
 		block.MerKleRoot,
 		Uint64ToByte(block.Version),
 		Uint64ToByte(block.TimeStamp),
@@ -93,7 +97,7 @@ func (block *Block) toByte() []byte {
 	return []byte{}
 }
 
-func (block *Block) Serialize() []byte  {
+func (block *Block) Serialize() []byte {
 	var buffer bytes.Buffer
 	encoder := gob.NewEncoder(&buffer)
 
@@ -104,6 +108,18 @@ func (block *Block) Serialize() []byte  {
 
 	return buffer.Bytes()
 }
+
+func (block *Block) MakeMerkleRoot() []byte {
+	//这是模拟梅克尔树，目前只是做哈希的拼接，后续再完成二叉树的构造
+
+	txs := block.Transactions
+	var hashInfo []byte
+	for _, tx := range txs {
+		hashInfo = append(hashInfo, tx.TXID...)
+	}
+
+	hash := sha256.Sum256(hashInfo)
+	return hash[:]}
 
 // 反序列化:将接受到的字节流转换成目标结构。
 func Deserialize(data []byte) Block {

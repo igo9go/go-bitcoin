@@ -70,12 +70,13 @@ func (pow *ProofOfWork) prepareData(nonce uint64) []byte {
 	tmp := [][]byte{
 		Uint64ToByte(block.Version),
 		block.PrevHash,
-		//block.Hash,
 		block.MerKleRoot,
 		Uint64ToByte(block.TimeStamp),
 		Uint64ToByte(block.Difficulty),
 		Uint64ToByte(nonce),
-		block.Data}
+		//block.Data,
+
+	}
 
 	data := bytes.Join(tmp, []byte{})
 	return data
@@ -87,7 +88,7 @@ func (pow *ProofOfWork) prepareData(nonce uint64) []byte {
 
 func (pow *ProofOfWork)IsValid()  bool{
 	hash := sha256.Sum256(pow.prepareData(pow.block.Nonce))
-	fmt.Printf("is valid hash : %x, %d\n", hash[:], pow.block.Nonce)
+	//fmt.Printf("is valid hash : %x, %d\n", hash[:], pow.block.Nonce)
 
 	tTmp := big.Int{}
 	tTmp.SetBytes(hash[:])

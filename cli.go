@@ -1,74 +1,66 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
+	"strconv"
 )
+
+//这是一个用来接收命令行参数并且控制区块链操作的文件
 
 type CLI struct {
 	bc *BlockChain
 }
 
 const Usage = `
-    ./blockchain addBlock --data DATA "add a block"
-    ./blockchain printChain "print block Chain"
+	printChain               "正向打印区块链"
+	printChainR              "反向打印区块链"
+	getBalance --address ADDRESS "获取指定地址的余额"
+	send FROM TO AMOUNT MINER DATA "由FROM转AMOUNT给TO，由MINER挖矿，同时写入DATA"
 `
 
+//接受参数的动作，我们放到一个函数中
+
 func (cli *CLI) Run() {
-	if len(os.Args) < 2 {
-		fmt.Println(Usage)
-		os.Exit(1)
+
+	//./block printChain
+	//./block addBlock --data "HelloWorld"
+	//1. 得到所有的命令
+	args := os.Args
+	if len(args) < 2 {
+		fmt.Printf(Usage)
+		return
 	}
 
-	cmd := os.Args[1]
-
+	//2. 分析命令
+	cmd := args[1]
 	switch cmd {
-	case "addBlock":
-		if len(os.Args) > 3 && os.Args[2] == "--data" {
-			data := os.Args[3]
-			if data == "" {
-				fmt.Println("data should not be empty!")
-				os.Exit(1)
-			}
-			cli.addBlock(data)
-		} else {
-			fmt.Println(Usage)
-		}
 	case "printChain":
-		cli.printChain()
-	default:
-		fmt.Println(Usage)
-	}
-}
-
-func (cli *CLI)addBlock(data string)  {
-	cli.bc.AddBlock(data)
-}
-
-func (cli *CLI)printChain()  {
-
-	//定义迭代器
-	it := NewBlockChainIterator(cli.bc)
-	for {
-
-		block := it.GetBlockAndMoveLeft()
-
-		fmt.Println(" ============== =============")
-		fmt.Printf("Version : %d\n", block.Version)
-		fmt.Printf("PrevBlockHash : %x\n", block.PrevHash)
-		fmt.Printf("Hash : %x\n", block.Hash)
-		fmt.Printf("MerkleRoot : %x\n", block.MerKleRoot)
-		fmt.Printf("TimeStamp : %d\n", block.TimeStamp)
-		fmt.Printf("Difficuty : %d\n", block.Difficulty)
-		fmt.Printf("Nonce : %d\n", block.Nonce)
-		fmt.Printf("Data : %s\n", block.Data)
-		pow := NewProofOfWork(&block)
-		fmt.Printf("IsValid : %v\n", pow.IsValid())
-
-
-		if len(block.PrevHash)  == 0 {
-			fmt.Println("print over!")
-			break
+		fmt.Printf("正向打印区块\n")
+		cli.PrinBlockChain()
+	case "printChainR":
+		fmt.Printf("反向打印区块\n")
+		cli.PrinBlockChainReverse()
+	case "getBalance":
+		fmt.Printf("获取余额\n")
+		if len(args) == 4 && args[2] == "--address" {
+			address := args[3]
+			cli.GetBalance(address)
 		}
+	case "send":
+		fmt.Println("开始转账...\n")
+		if len(args) != 7 {
+			fmt.Printf("参数个数错误")
+		}
+
+		from := args[2]
+		to := args[3]
+		amount, _ := strconv.ParseFloat(args[4], 64) //知识点，请注意
+		miner := args[5]
+		data := args[6]
+		cli.Send(from, to, amount, miner, data)
+	default:
+		fmt.Printf("无效的命令，请检查!\n")
+		fmt.Printf(Usage)
 	}
 }

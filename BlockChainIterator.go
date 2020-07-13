@@ -1,53 +1,49 @@
 package main
 
 import (
-	"fmt"
 	"github.com/boltdb/bolt"
-	"os"
+	"log"
 )
 
 type BlockChainIterator struct {
 	db *bolt.DB
-
-	current_point []byte
+	//游标，用于不断索引
+	currentHashPointer []byte
 }
 
-func NewBlockChainIterator(bc *BlockChain) BlockChainIterator {
-	var it BlockChainIterator
+//func NewIterator(bc *BlockChain)  {
+//
+//}
 
-	it.db = bc.db
-	it.current_point = bc.tail
-	return it
+func (bc *BlockChain) NewIterator() *BlockChainIterator {
+	return &BlockChainIterator{
+		bc.db,
+		//最初指向区块链的最后一个区块，随着Next的调用，不断变化
+		bc.tail,
+	}
 }
 
-
-//一般叫Next(),迭代器的访问函数
-func (it *BlockChainIterator)GetBlockAndMoveLeft() Block {
+//迭代器是属于区块链的
+//Next方式是属于迭代器的
+//1. 返回当前的区块
+//2. 指针前移
+func (it *BlockChainIterator) Next() *Block {
 	var block Block
-	//1. 获取block
 	it.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(blockBucket))
-
-		//如果是空的，报错。
 		if bucket == nil {
-			fmt.Println("bucket should not be nil!!")
-			os.Exit(1)
-		} else {
-			//根据当前的current_pointer获取block
-			//这是一个字节流，需要反序列化
-			current_block_tmp := bucket.Get(it.current_point)
-			//fmt.Println("current_block_tmp : ", current_block_tmp)
-			current_block := Deserialize(current_block_tmp)
-
-			//这就拿到了我们想要的区块数据，准备返回
-			block = current_block
-
-			//将游标（指针）左移
-			//2. 向左移动
-			it.current_point = current_block.PrevHash
+			log.Panic("迭代器遍历时bucket不应该为空，请检查!")
 		}
+
+		blockTmp := bucket.Get(it.currentHashPointer)
+		//解码动作
+		block = Deserialize(blockTmp)
+		//游标哈希左移
+		it.currentHashPointer = block.PrevHash
+
 		return nil
 	})
 
-	return block
+	return &block
 }
+
