@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LeetcodeEditor">
+    <option name="projectConfig">
+      <map>
+        <entry key="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[16]最接近的三数之和.go">
+          <value>
+            <LeetcodeEditor>
+              <option name="path" value="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[16]最接近的三数之和.go" />
+              <option name="questionId" value="16" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[1]两数之和.go">
+          <value>
+            <LeetcodeEditor>
+              <option name="path" value="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[1]两数之和.go" />
+              <option name="questionId" value="1" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[2]两数相加.go">
+          <value>
+            <LeetcodeEditor>
+              <option name="path" value="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[2]两数相加.go" />
+              <option name="questionId" value="2" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[3]无重复字符的最长子串.go">
+          <value>
+            <LeetcodeEditor>
+              <option name="path" value="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[3]无重复字符的最长子串.go" />
+              <option name="questionId" value="3" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[5]最长回文子串.go">
+          <value>
+            <LeetcodeEditor>
+              <option name="path" value="$USER_HOME$/mygo/src/leetcode/leetcode/editor/cn/[5]最长回文子串.go" />
+              <option name="questionId" value="5" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
